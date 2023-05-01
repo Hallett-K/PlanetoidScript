@@ -200,8 +200,62 @@ int main(int argc, char** argv)
         case 1:
             RanAsExecutable();
             break;
+        case 2:
+            {
+                std::cout << "Loading file " << argv[1] << '\n';
+                // Open the file using C++'s file I/O.
+                std::fstream file;
+                file.open(argv[1], std::ios::in);
+                if (file.is_open())
+                {
+                    // Load the file into a string.
+                    std::string fileContents;
+                    file.seekg(0, std::ios::end);
+                    fileContents.resize(file.tellg());
+                    file.seekg(0, std::ios::beg);
+                    file.read(&fileContents[0], fileContents.size());
+                    file.close();
+
+                    // Evaluate the file.
+                    Evaluate(fileContents, argv[1]);
+                }
+                else
+                {
+                    std::cout << "Failed to open file.\n";
+                }
+            }
+            break;
+        case 3:
+            {
+                std::cout << "Loading file " << argv[1] << '\n';
+                // Open the file using C++'s file I/O.
+                std::fstream file;
+                file.open(argv[1], std::ios::in);
+                if (file.is_open())
+                {
+                    // Load the file into a string.
+                    std::string fileContents;
+                    file.seekg(0, std::ios::end);
+                    fileContents.resize(file.tellg());
+                    file.seekg(0, std::ios::beg);
+                    file.read(&fileContents[0], fileContents.size());
+                    file.close();
+
+                    if (std::string(argv[2]) == "-bench")
+                        Bench(fileContents, argv[1]);
+                    else if (std::string(argv[2]) == "-verify")
+                        Verify(fileContents);
+                    else
+                        std::cout << "Invalid argument " << argv[2] << '\n';
+                }
+                else
+                {
+                    std::cout << "Failed to open file.\n";
+                }
+            }
+            break;
         default:
-            std::cout << "Hello, World!" << '\n';
+            std::cout << "Invalid arguments" << '\n';
             break;
     }
 }

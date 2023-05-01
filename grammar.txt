@@ -60,3 +60,14 @@ sqrt(number) - returns the square root of number
 log(number) - returns the log of number with base e 
 log10(number) - returns the log of number with base 10
 
+Running
+
+PlanetoidScript can be run as an executable or as a command line interface
+
+./PlanetoidScript - runs as executable
+./PlanetoidScript <filename> [flag] - Loads a file
+
+[flag]
+None - evaluates the file
+-bench - benchmarks the file
+-verify - verifies the file
