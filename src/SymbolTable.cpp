@@ -80,7 +80,7 @@ bool SymbolTable::VarExists(const std::string& varName, bool global) const
     }
     else if (m_parentScope != NULL && global)
     {
-        return m_parentScope->VarExists(varName);
+        return m_parentScope->VarExists(varName, true);
     }
     return false;
 }
@@ -117,7 +117,7 @@ Value SymbolTable::GetVar(const std::string& name, bool global) const
     }
     else if (m_parentScope != NULL && global)
     {
-        return m_parentScope->GetVar(name);
+        return m_parentScope->GetVar(name, true);
     }
 
     return Value(-1);

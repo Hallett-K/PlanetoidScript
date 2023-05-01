@@ -9,6 +9,7 @@ ArrayIndex - identifier[ComparisonSequence] [= ComparisonSequence]
 
 ObjectDefinition - object { ObjectIdentifiers }
 ObjectIdentifiers - { Identifier ; [ Identifier ; ... ] }
+// If an 'init' function is defined in an object, it will be called when an instance is created
 
 Identifier - [Identifier.]Identifier [ = ComparisonSequence OR ArrayInit OR FunctionDefinition OR ObjectDefinition OR FunctionCall] OR ArrayIndex OR FunctionCall
 
