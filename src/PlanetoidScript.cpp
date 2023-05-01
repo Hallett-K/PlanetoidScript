@@ -1,3 +1,4 @@
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -25,6 +26,27 @@ void Evaluate(const std::string& input, const std::string& source)
         return;
 
     G_interpreter.Interpret(node);
+}
+
+void Bench(const std::string& input, const std::string& source)
+{
+    Lexer lexer(source, input);
+    std::vector<Token> tokens = lexer.generateTokens();
+
+    if (tokens.size() == 0)
+        return;
+
+    Parser parser(tokens);
+    TokenNode* node = parser.Parse();
+
+    if (!node)
+        return;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    G_interpreter.Interpret(node);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
 }
 
 void Verify(const std::string& input)
@@ -67,6 +89,8 @@ void RanAsExecutable()
             std::cout << "verifyfile [filename] - Verify a file\n]";
             std::cout << "load [filename] - Load a file\n";
             std::cout << "generate [filename] - Generate a file\n";
+            std::cout << "bench <...> - Benchmark an expression\n";
+            std::cout << "benchfile [filename] - Benchmark a file\n";
             std::cout << "exit - Exit the program\n";
         }
         else if (input.substr(0, 4) == "eval")
@@ -132,6 +156,34 @@ void RanAsExecutable()
             std::fstream file;
             file.open(input.substr(9, input.length()), std::ios::out);
             file.close();
+        }
+        else if (input.substr(0, 9) == "benchfile")
+        {
+            std::cout << "Loading file " << input.substr(5, input.length()) << '\n';
+            // Open the file using C++'s file I/O.
+            std::fstream file;
+            file.open(input.substr(10, input.length()), std::ios::in);
+            if (file.is_open())
+            {
+                // Load the file into a string.
+                std::string fileContents;
+                file.seekg(0, std::ios::end);
+                fileContents.resize(file.tellg());
+                file.seekg(0, std::ios::beg);
+                file.read(&fileContents[0], fileContents.size());
+                file.close();
+
+                // Evaluate the file.
+                Bench(fileContents, input.substr(10, input.length()));
+            }
+            else
+            {
+                std::cout << "Failed to open file.\n";
+            }
+        }
+        else if (input.substr(0, 5) == "bench")
+        {
+            Bench(input.substr(6, input.length()), "bench");
         }
         else if (input != "exit")
         {
