@@ -1,0 +1,21 @@
+// Object Example
+
+Person = object
+{
+	init = func
+	{
+		name = args[0];
+		age = args[1];
+	};
+	
+	hello = func
+	{
+		print(name, ": Hello! I am ", age, " years old!");
+	};
+	
+	name = "";
+	age = 0;
+};
+
+bob = Person("Bob", 34);
+bob.hello();

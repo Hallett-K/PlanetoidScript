@@ -50,6 +50,8 @@ public:
 
     const std::string& GetName() const;
 
+    void CleanUp();
+
 private:
     std::unordered_map<std::string, Value> m_variables;
     std::vector<std::string> m_keywords;

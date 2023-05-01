@@ -1,0 +1,19 @@
+// Guess the number
+
+seed();
+input_number = round(random(0, 100));
+input_string = input("Guess: ");
+while (tonumber(input_string) != input_number)
+{
+	if (tonumber(input_string) > input_number)
+	{
+		print("Lower!");
+	} 
+	else if (tonumber(input_string) < input_number)
+	{
+		print("Higher!");
+	};
+	
+	input_string = input("Guess: ");
+};
+print("You got it!");

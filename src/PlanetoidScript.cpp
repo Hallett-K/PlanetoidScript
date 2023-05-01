@@ -5,9 +5,11 @@
 
 #include "Interpreter.hpp"
 #include "Lexer.hpp"
-#include "Value.hpp"
 #include "Parser.hpp"
+#include "SymbolTable.hpp"
 #include "Token.hpp"
+#include "Value.hpp"
+
 
 Interpreter G_interpreter;
 
@@ -26,6 +28,7 @@ void Evaluate(const std::string& input, const std::string& source)
         return;
 
     G_interpreter.Interpret(node);
+    G_interpreter.Reset();
 }
 
 void Bench(const std::string& input, const std::string& source)

@@ -1,0 +1,38 @@
+// Functions and loops
+
+add = func
+{
+	num = 0;
+	for (i = 0; i < sizeof(args); i = i + 1)
+	{
+		num = num + args[i];
+	};
+	return num;
+};
+
+mul = func
+{
+	iter = 0;
+	sum = 0;
+	do
+	{
+		sum = sum + args[iter];
+		iter = iter + 1;
+	}
+	while (iter < sizeof(args));
+};
+
+sub = func
+{
+	iter = 1;
+	res = args[0];
+	while (iter < sizeof(args)) // do
+	{
+		res = res - args[iter];
+		iter = iter + 1;
+	};
+};
+
+print("60 - 8 - 3 - 1 = ", sub(60, 8, 3, 1));
+print("3 + 4 + 5 = ", add(3, 4, 5));
+print("3 * 2 * 2 = ", mul(3, 2, 2));

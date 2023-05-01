@@ -34,6 +34,8 @@ public:
     Value InterpretReturn(TokenNode* node);
     Value InterpretFunctionDefinition(TokenNode* node);
     Value InterpretObjectDefinition(TokenNode* node);
+
+    void Reset();
 private:
     SymbolTable* m_currentSymbolTable;
     ApplicationState m_state;

@@ -504,7 +504,7 @@ Value Interpreter::InterpretArrayAccess(TokenNode* node)
     }
     else
     {
-        array = m_currentSymbolTable->GetVar(varName);
+        array = m_currentSymbolTable->GetVar(varName, true);
     }
     if (!array.isString() && !array.isArray())
     {
@@ -857,4 +857,19 @@ Value Interpreter::InterpretObjectDefinition(TokenNode* node)
 
     m_currentSymbolTable = m_currentSymbolTable->GetParentScope();
     return Value();
+}
+
+void Interpreter::Reset()
+{
+    m_state.hasError = false;
+    m_state.canBreak = false;
+    m_state.canContinue = false;
+    m_state.canReturn = false;
+    m_state.breakCalled = false;
+    m_state.continueCalled = false;
+    m_state.returnCalled = false;
+    m_state.returnValue = Value();
+
+    m_currentSymbolTable = &g_symbolTable;
+    g_symbolTable.CleanUp();
 }

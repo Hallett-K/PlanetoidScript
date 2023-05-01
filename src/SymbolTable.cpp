@@ -41,35 +41,7 @@ SymbolTable::SymbolTable(const std::string& name, SymbolTable* parentScope)
 
 SymbolTable::~SymbolTable()
 {
-    /*m_variables.clear();
-    m_parentScope = NULL;
-
-    for (auto& func : m_builtInFunctions)
-    {
-        func.second = NULL;
-    }
-    m_builtInFunctions.clear();
-
-    m_keywords.clear();
-
-    for (auto& func : m_userFunctions)
-    {
-        delete func.second;
-        func.second = NULL;
-    }
-
-    m_userFunctions.clear();
-
-    m_objectNames.clear();
-    m_objectInstanceNames.clear();
-
-    for (auto& scope : m_scopes)
-    {
-        delete scope.second;
-        scope.second = NULL;
-    }
-
-    m_scopes.clear();*/
+    
 }
 
 bool SymbolTable::VarExists(const std::string& varName, bool global) const
@@ -388,6 +360,21 @@ unsigned int SymbolTable::GetScopeCount() const
 const std::string& SymbolTable::GetName() const
 {
     return m_name;
+}
+
+void SymbolTable::CleanUp()
+{
+    m_variables.clear();
+    m_userFunctions.clear();
+    m_objectNames.clear();
+    m_objectInstanceNames.clear();
+    m_userFunctions.clear();
+    for (auto& scope : m_scopes)
+    {
+        scope.second->CleanUp();
+        delete scope.second;
+    }
+    m_scopes.clear();
 }
 
 Value SymbolTable::Print(const std::vector<Value>& args)
