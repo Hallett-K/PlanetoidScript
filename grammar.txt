@@ -1,0 +1,61 @@
+ControlStatement - break OR continue OR return [ComparisonSequence]
+
+ArgumentList - ComparisonSequence [, ComparisonSequence ...]
+FunctionCall - identifier(ArgumentList)
+FunctionDefinition - func { Lines }
+
+ArrayInit - [ ComparisonSequence (, ComparisonSequence ...)]
+ArrayIndex - identifier[ComparisonSequence] [= ComparisonSequence]
+
+ObjectDefinition - object { ObjectIdentifiers }
+ObjectIdentifiers - { Identifier ; [ Identifier ; ... ] }
+
+Identifier - [Identifier.]Identifier [ = ComparisonSequence OR ArrayInit OR FunctionDefinition OR ObjectDefinition OR FunctionCall] OR ArrayIndex OR FunctionCall
+
+ForStatement - for (Factor; ComparisonSequence; Expression) { Lines }
+DoWhileStatement - do { Lines } while (comparisonSequence)
+WhileStatement - while (comparisonSequence) { Lines } 
+IfStatement - if ( comparisonSequence ) { Lines } [else (ifStatement OR { Lines })
+Factor - [+/-] Number OR String OR ( ComparisonSequence ) OR Identifier OR IfStatement OR WhileStatement OR ArrayIndex OR ControlStatement
+Primary - Factor [^ Factor]
+Term - Primary [(+/-) Primary]
+Expression - Term [(* /) Term]
+Comparison - (!) Expression ([==, != ...] Expression)
+ComparisonSequence - Comparison ([&&, ||] Comparison)
+Line - ComparisonSequence ;
+Lines - Line (Line ...) OR { Line (Line...) }
+
+// Single line comments are ignored
+
+/*
+Multiline comments
+are also
+ignored 
+*/
+
+Functions:
+
+print(Args) - prints arguments
+substring(string, start, length) - returns a substring that's length characters long from start
+strlen(string) - returns the length of a string
+input(Args) prints arguments, then waits console input. Returns the input as a string
+tostring(number) - returns number as a string
+tonumber(string) - returns string as a number
+sizeof(arg) - returns size of array or number of characters in string
+seed(number) - seeds the random number generator. Leave empty for random seed
+random(min, max) - returns a random number between min and max
+round(number) - rounds a number 
+floor(number) - rounds a number down
+ceil(number) - rounds a number up
+abs(number) - returns the abs of number
+sin(number) - returns the sine of number 
+cos(number) - returns the cosine of number 
+tan(number) - returns the tangent of number 
+asin(number) - returns the inverse sine of number 
+acos(number) - returns the inverse cosine of number
+atan(number) - returns the inverse tangent of number 
+atan2(y, x) - returns the inverse tangent of x and y
+sqrt(number) - returns the square root of number
+log(number) - returns the log of number with base e 
+log10(number) - returns the log of number with base 10
+
