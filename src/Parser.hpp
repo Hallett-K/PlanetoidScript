@@ -31,6 +31,7 @@ private:
     TokenNode* parseWhile();
     TokenNode* parseDoWhile();
     TokenNode* parseFor();
+    TokenNode* parseForEach();
 
     TokenNode* parseIdentifier(Token object = Token(Token::Type::None, ""));
 

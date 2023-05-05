@@ -12,7 +12,7 @@ SymbolTable::SymbolTable(const std::string& name, SymbolTable* parentScope)
 {
     if (m_parentScope == NULL)
     {
-        m_keywords = { "if", "else", "while", "do", "for", "true", "false", "null", "break", "continue", "return", "func", "object", "this" };
+        m_keywords = { "if", "else", "while", "do", "for", "foreach", "true", "false", "null", "break", "continue", "return", "func", "object", "this", "in" };
         m_builtInFunctions["print"] = &SymbolTable::Print;
         m_builtInFunctions["substring"] = &SymbolTable::Substring;
         m_builtInFunctions["strlen"] = &SymbolTable::stringlength;

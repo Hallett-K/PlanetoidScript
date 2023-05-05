@@ -145,6 +145,21 @@ TokenNode* ForNode::GetBlock() const
     return m_block;
 }
 
+ForEachNode::ForEachNode(Token token, TokenNode* init, TokenNode* block)
+    : TokenNode(token, NodeType::ForEach), m_array(init), m_block(block)
+{
+}
+
+TokenNode* ForEachNode::GetArray() const
+{
+    return m_array;
+}
+
+TokenNode* ForEachNode::GetBlock() const
+{
+    return m_block;
+}
+
 ArrayAccessNode::ArrayAccessNode(Token token, Token object, TokenNode* index)
     : TokenNode(token, NodeType::ArrayAccess), m_object(object), m_index(index)
 {

@@ -16,6 +16,7 @@ enum class NodeType
     If,
     While,
     For,
+    ForEach,
     ArrayAccess, // array identifier
     ArrayInit, // array = [ ... ]
     ArrayAssign, // array[index] = value
@@ -157,6 +158,19 @@ private:
     TokenNode* m_init;
     TokenNode* m_condition;
     TokenNode* m_increment;
+    TokenNode* m_block;
+};
+
+class ForEachNode : public TokenNode
+{
+public:
+    ForEachNode(Token token, TokenNode* array, TokenNode* block);
+    virtual ~ForEachNode() = default;
+
+    TokenNode* GetArray() const;
+    TokenNode* GetBlock() const;
+private:
+    TokenNode* m_array;
     TokenNode* m_block;
 };
 

@@ -15,7 +15,7 @@ ObjectIdentifiers - { Identifier ; [ Identifier ; ... ] }
 
 Identifier - [Identifier.]Identifier [ = ComparisonSequence OR ArrayInit OR FunctionDefinition OR ObjectDefinition OR FunctionCall] OR ArrayIndex OR FunctionCall
 
-ForStatement - for (Factor; ComparisonSequence; Expression) { Lines }
+ForStatement - for (Factor; ComparisonSequence; Expression) { Lines } OR foreach (Identifier in Factor) { Lines }
 DoWhileStatement - do { Lines } while (comparisonSequence)
 WhileStatement - while (comparisonSequence) { Lines } 
 IfStatement - if ( comparisonSequence ) { Lines } [else (ifStatement OR { Lines })

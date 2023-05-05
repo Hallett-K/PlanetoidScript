@@ -25,6 +25,7 @@ public:
     Value InterpretIf(TokenNode* node);
     Value InterpretWhile(TokenNode* node);
     Value InterpretFor(TokenNode* node);
+    Value InterpretForEach(TokenNode* node);
     Value InterpretArrayAccess(TokenNode* node);
     Value InterpretArrayInit(TokenNode* node);
     Value InterpretArrayAssign(TokenNode* node);

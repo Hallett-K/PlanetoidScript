@@ -240,6 +240,10 @@ TokenNode* Parser::parseFactor()
         {
             return parseFor();
         }
+        else if (m_tokens[m_index].GetValue() == "foreach")
+        {
+            return parseForEach();
+        }
         else if (m_tokens[m_index].GetValue() == "continue")
         {
             advance();
@@ -475,6 +479,51 @@ TokenNode* Parser::parseFor()
     }
     advance();
     return new ForNode(forToken, init, condition, increment, body);
+}
+
+TokenNode* Parser::parseForEach()
+{
+    advance();
+    if (m_tokens[m_index].GetType() != Token::Type::LeftParenthesis)
+    {
+        Error e("Expected '('", Position("Parser", 0, 0, m_index));
+        std::cout << e.ToString() << '\n';
+        return NULL;
+    }
+    advance();
+    Token var = m_tokens[m_index];
+    advance();
+    if (m_tokens[m_index].GetType() != Token::Type::Keyword || m_tokens[m_index].GetValue() != "in")
+    {
+        Error e("Expected 'in'", Position("Parser", 0, 0, m_index));
+        std::cout << e.ToString() << '\n';
+        return NULL;
+    }
+    advance();
+    TokenNode* array = parseFactor();
+    if (m_tokens[m_index].GetType() != Token::Type::RightParenthesis)
+    {
+        Error e("Expected ')'", Position("Parser", 0, 0, m_index));
+        std::cout << e.ToString() << '\n';
+        return NULL;
+    }
+    advance();
+    if (m_tokens[m_index].GetType() != Token::Type::LeftBrace)
+    {
+        Error e("Expected '{'", Position("Parser", 0, 0, m_index));
+        std::cout << e.ToString() << '\n';
+        return NULL;
+    }
+    advance();
+    TokenNode* body = parseLines(true);
+    if (m_tokens[m_index].GetType() != Token::Type::RightBrace)
+    {
+        Error e("Expected '}'", Position("Parser", 0, 0, m_index));
+        std::cout << e.ToString() << '\n';
+        return NULL;
+    }
+    advance();
+    return new ForEachNode(var, array, body);
 }
 
 TokenNode* Parser::parseIdentifier(Token object)

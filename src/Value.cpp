@@ -467,3 +467,19 @@ std::string Value::toString() const
         return "NULL";
     }
 }
+
+size_t Value::size() const
+{
+    if (m_type == Type::Array)
+    {
+        return m_array.size();
+    }
+    else if (m_type == Type::String)
+    {
+        return m_string.size();
+    }
+    else
+    {
+        return 0;
+    }
+}

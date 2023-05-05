@@ -61,6 +61,10 @@ Value Interpreter::Interpret(TokenNode* node)
     {
         return InterpretFor(node);
     }
+    else if (node->GetType() == NodeType::ForEach)
+    {
+        return InterpretForEach(node);
+    }
     else if (node->GetType() == NodeType::ArrayAccess)
     {
         return InterpretArrayAccess(node);
@@ -471,6 +475,73 @@ Value Interpreter::InterpretFor(TokenNode* node)
 
     m_currentSymbolTable = m_currentSymbolTable->GetParentScope();
     m_currentSymbolTable->RemoveScope("ForLoop" + std::to_string(scopeCount));
+
+    m_state.canContinue = retainContinue;
+    m_state.canBreak = retainBreak;
+
+    return result;
+}
+
+Value Interpreter::InterpretForEach(TokenNode* node)
+{
+    ForEachNode* forEachNode = dynamic_cast<ForEachNode*>(node);
+
+    unsigned int scopeCount = m_currentSymbolTable->GetScopeCount();
+    m_currentSymbolTable->AddScope("ForEachLoop" + std::to_string(scopeCount));
+    m_currentSymbolTable = m_currentSymbolTable->GetScope("ForEachLoop" + std::to_string(scopeCount));
+
+    Value result(0);
+
+    Value array = Interpret(forEachNode->GetArray());
+
+    //Value init = Interpret(forNode->GetInit());
+    //Value condition = Interpret(forNode->GetCondition());
+
+    bool retainContinue = m_state.canContinue;
+    bool retainBreak = m_state.canBreak;
+
+    m_state.canContinue = true;
+    m_state.canBreak = true;
+
+    if (array.isArray())
+    {
+        for (int i = 0; i < array.size(); i++)
+        {
+            m_currentSymbolTable->RegisterVar(forEachNode->GetToken().GetValue(), array.getArray().at(i));
+            result = Interpret(forEachNode->GetBlock());
+            if (m_state.breakCalled)
+            {
+                m_state.breakCalled = false;
+                break;
+            }
+            if (m_state.continueCalled)
+            {
+                m_state.continueCalled = false;
+                continue;
+            }
+        }
+    }
+    else if (array.isString())
+    {
+        for (int i = 0; i < array.size(); i++)
+        {
+            m_currentSymbolTable->RegisterVar(forEachNode->GetToken().GetValue(), array.getString().substr(i, 1));
+            result = Interpret(forEachNode->GetBlock());
+            if (m_state.breakCalled)
+            {
+                m_state.breakCalled = false;
+                break;
+            }
+            if (m_state.continueCalled)
+            {
+                m_state.continueCalled = false;
+                continue;
+            }
+        }
+    }
+
+    m_currentSymbolTable = m_currentSymbolTable->GetParentScope();
+    m_currentSymbolTable->RemoveScope("ForEachLoop" + std::to_string(scopeCount));
 
     m_state.canContinue = retainContinue;
     m_state.canBreak = retainBreak;
