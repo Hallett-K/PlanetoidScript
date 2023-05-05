@@ -615,7 +615,27 @@ TokenNode* Parser::parseFunctionDefinition(Token object)
 TokenNode* Parser::parseObjectDefinition(Token object)
 {
     Token obj = m_tokens[m_index - 2];
+    TokenNode* parent = NULL;
     advance();
+    if (m_tokens[m_index].GetType() == Token::Type::LeftParenthesis)
+    {
+        advance();
+        if (m_tokens[m_index].GetType() != Token::Type::Identifier)
+        {
+            Error e("Expected identifier", Position("Parser", 0, 0, m_index));
+            std::cout << e.ToString() << '\n';
+            return NULL;
+        }
+        parent = new TokenNode(m_tokens[m_index], NodeType::Identifier);
+        advance();
+        if (m_tokens[m_index].GetType() != Token::Type::RightParenthesis)
+        {
+            Error e("Expected ')'", Position("Parser", 0, 0, m_index));
+            std::cout << e.ToString() << '\n';
+            return NULL;
+        }
+        advance();
+    }
     if (m_tokens[m_index].GetType() != Token::Type::LeftBrace)
     {
         Error e("Expected '{'", Position("Parser", 0, 0, m_index));
@@ -631,7 +651,7 @@ TokenNode* Parser::parseObjectDefinition(Token object)
         return NULL;
     }
     advance();
-    return new ObjectDefinitionNode(obj, body);
+    return new ObjectDefinitionNode(obj, body, parent);
 }
 
 TokenNode* Parser::parseObjectIdentifiers()

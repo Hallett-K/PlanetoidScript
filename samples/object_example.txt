@@ -17,5 +17,21 @@ Person = object
 	age = 0;
 };
 
+Dave = object(Person)
+{
+	init = func
+	{
+		super_init("Dave", 48);
+	};
+
+	hello = func
+	{
+		super_hello();
+	};
+};
+
 bob = Person("Bob", 34);
 bob.hello();
+
+dave = Dave();
+dave.hello();

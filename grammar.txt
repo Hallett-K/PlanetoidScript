@@ -7,9 +7,11 @@ FunctionDefinition - func { Lines }
 ArrayInit - [ ComparisonSequence (, ComparisonSequence ...)]
 ArrayIndex - identifier[ComparisonSequence] [= ComparisonSequence]
 
-ObjectDefinition - object { ObjectIdentifiers }
+ObjectDefinition - object[( ParentName )] { ObjectIdentifiers }
 ObjectIdentifiers - { Identifier ; [ Identifier ; ... ] }
 // If an 'init' function is defined in an object, it will be called when an instance is created
+// If a ParentName is provided, the new object will inherit from object named ParentName. Parent functions are preceded by "super_"
+// so to call a parent's init function from the child, you'd call super_init();
 
 Identifier - [Identifier.]Identifier [ = ComparisonSequence OR ArrayInit OR FunctionDefinition OR ObjectDefinition OR FunctionCall] OR ArrayIndex OR FunctionCall
 

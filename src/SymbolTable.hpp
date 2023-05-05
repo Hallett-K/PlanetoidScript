@@ -30,7 +30,7 @@ public:
     void RegisterUserFunction(const std::string& name, TokenNode* node);
     TokenNode* GetUserFunction(const std::string& name, bool global = false) const;
 
-    bool RegisterObject(const std::string& name);
+    bool RegisterObject(const std::string& name, const std::string& parentName = "");
     bool ObjectExists(const std::string& name, bool global = false) const;
     SymbolTable* GetObjectScope(const std::string& name) const;
     std::string GetObjectScopeName(const std::string& name) const;

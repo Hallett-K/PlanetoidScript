@@ -639,6 +639,7 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node)
     std::string funcName = token.GetValue();
 
     SymbolTable* scope = m_currentSymbolTable;
+    bool globalFunctionSearch = true;
     if (funcCallNode->GetObject().GetType() == Token::Type::Identifier)
     {
         Token object = funcCallNode->GetObject();
@@ -646,6 +647,7 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node)
         {
             std::string instanceName = m_currentSymbolTable->GetObjectInstanceScopeName(object.GetValue());
             scope = m_currentSymbolTable->GetScope(instanceName);
+            globalFunctionSearch = false;
         }
         else
         {
@@ -668,7 +670,7 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node)
         }
         return m_currentSymbolTable->CallBuiltInFunction(funcName, args);
     }
-    else if (scope->IsUserFunction(funcName))
+    else if (scope->IsUserFunction(funcName, globalFunctionSearch))
     {
         std::vector<Value> args;
         ArgumentListNode* argListNode = dynamic_cast<ArgumentListNode*>(funcCallNode->GetArguments());
@@ -691,7 +693,7 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node)
         m_state.canReturn = true;
 
         m_currentSymbolTable = scope;
-        Value result = Interpret(parent->GetUserFunction(funcName));
+        Value result = Interpret(parent->GetUserFunction(funcName, globalFunctionSearch));
         m_currentSymbolTable = current;
 
         if (m_state.returnCalled)
@@ -804,8 +806,14 @@ Value Interpreter::InterpretObjectDefinition(TokenNode* node)
     ObjectDefinitionNode* objDefNode = dynamic_cast<ObjectDefinitionNode*>(node);
     Token token = objDefNode->GetToken();
     std::string objName = token.GetValue();
+    TokenNode* parentToken = objDefNode->GetParent();
+    std::string parentName = "";
+    if (parentToken)
+    {
+        parentName = parentToken->GetToken().GetValue();
+    }
 
-    if (!m_currentSymbolTable->RegisterObject(objName))
+    if (!m_currentSymbolTable->RegisterObject(objName, parentName))
     {
         Error e("Object Definition with duplicate name: ", Position("Interpreter", 0, 0, 0));
         std::cout << e.ToString() << objName << '\n';

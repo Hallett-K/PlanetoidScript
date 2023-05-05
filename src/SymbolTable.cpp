@@ -196,7 +196,7 @@ TokenNode* SymbolTable::GetUserFunction(const std::string& name, bool global) co
     return function;
 }
 
-bool SymbolTable::RegisterObject(const std::string& name)
+bool SymbolTable::RegisterObject(const std::string& name, const std::string& parentName)
 {
     if (ObjectExists(name))
     {
@@ -206,6 +206,28 @@ bool SymbolTable::RegisterObject(const std::string& name)
     unsigned int scopeCount = GetScopeCount();
     AddScope("ObjectDef" + name + std::to_string(scopeCount));
     m_objectNames[name] = "ObjectDef" + name + std::to_string(scopeCount);
+    SymbolTable* objectDef = GetScope("ObjectDef" + name + std::to_string(scopeCount));
+
+    if (parentName != "")
+    {
+        SymbolTable* parentScope = GetObjectScope(parentName);
+        if (parentScope != NULL)
+        {
+            parentScope = parentScope->GetScope(parentScope->GetObjectScopeName(parentName));
+            if (parentScope != NULL)
+            {
+                for (auto& var : parentScope->m_variables)
+                {
+                    objectDef->m_variables[var.first] = var.second;
+                }
+
+                for (auto& func : parentScope->m_userFunctions)
+                {
+                    objectDef->m_userFunctions["super_" + func.first] = func.second;
+                }
+            }
+        }
+    }
 
     return true;
 }
@@ -264,7 +286,7 @@ bool SymbolTable::AddObjectInstance(const std::string& name, const std::string& 
     m_objectNames[name] = "ObjectInst" + name + std::to_string(scopeCount);
 
     SymbolTable* objectDefinition = GetObjectScope(objectName);
-    objectDefinition = objectDefinition->GetScope(GetObjectScopeName(objectName));
+    objectDefinition = objectDefinition->GetScope(objectDefinition->GetObjectScopeName(objectName));
 
     SymbolTable* objectInstance = GetScope("ObjectInst" + name + std::to_string(scopeCount));
     
