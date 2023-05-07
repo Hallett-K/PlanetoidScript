@@ -19,6 +19,7 @@ ForStatement - for (Factor; ComparisonSequence; Expression) { Lines } OR foreach
 DoWhileStatement - do { Lines } while (comparisonSequence)
 WhileStatement - while (comparisonSequence) { Lines } 
 IfStatement - if ( comparisonSequence ) { Lines } [else (ifStatement OR { Lines })
+
 Factor - [+/-] Number OR String OR ( ComparisonSequence ) OR Identifier OR IfStatement OR WhileStatement OR ArrayIndex OR ControlStatement
 Primary - Factor [^ Factor]
 Term - Primary [(+/-) Primary]

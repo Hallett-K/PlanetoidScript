@@ -353,6 +353,56 @@ void SymbolTable::DestroyObjectInstance(const std::string& name)
     }
 }
 
+bool SymbolTable::RegisterModule(const std::string& name, SymbolTable* module)
+{
+    if (m_parentScope != NULL)
+    {
+        return m_parentScope->RegisterModule(name, module);
+    }
+
+    if (ModuleExists(name))
+        return false;
+
+    m_modules[name] = module;
+
+    return true;
+}
+
+bool SymbolTable::ModuleExists(const std::string& name) const
+{
+    if (m_parentScope != NULL)
+    {
+        return m_parentScope->ModuleExists(name);
+    }
+
+    return m_modules.find(name) != m_modules.end();
+}
+
+SymbolTable* SymbolTable::GetModule(const std::string& name)
+{
+    if (m_parentScope != NULL)
+    {
+        return m_parentScope->GetModule(name);
+    }
+
+    if (!ModuleExists(name))
+        return NULL;
+    return m_modules.at(name);
+}
+
+void SymbolTable::DestroyModule(const std::string& name)
+{
+    if (m_parentScope != NULL)
+    {
+        return m_parentScope->DestroyModule(name);
+    }
+
+    if (!ModuleExists(name))
+        return;
+
+    m_modules.erase(name);
+}
+
 SymbolTable* SymbolTable::GetParentScope() const
 {
     return m_parentScope;
@@ -396,7 +446,13 @@ void SymbolTable::CleanUp()
         scope.second->CleanUp();
         delete scope.second;
     }
+    for (auto& module : m_modules)
+    {
+        module.second->CleanUp();
+        delete module.second;
+    }
     m_scopes.clear();
+    m_modules.clear();
 }
 
 Value SymbolTable::Print(const std::vector<Value>& args)

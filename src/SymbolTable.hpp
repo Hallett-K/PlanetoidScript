@@ -41,8 +41,12 @@ public:
     SymbolTable* GetObjectInstanceScope(const std::string& name) const;
     void DestroyObjectInstance(const std::string& name);
 
-    SymbolTable* GetParentScope() const;
+    bool RegisterModule(const std::string& name, SymbolTable* module);
+    bool ModuleExists(const std::string& name) const;
+    SymbolTable* GetModule(const std::string& name);
+    void DestroyModule(const std::string& name);
 
+    SymbolTable* GetParentScope() const;
     void AddScope(const std::string& name);
     SymbolTable* GetScope(const std::string& name) const;
     void RemoveScope(const std::string& name);
@@ -52,30 +56,24 @@ public:
 
     void CleanUp();
 
-private:
+
+protected:
     std::unordered_map<std::string, Value> m_variables;
     std::vector<std::string> m_keywords;
 
-    typedef Value (SymbolTable::*BuiltInFunction)(const std::vector<Value>&);
+    typedef Value(SymbolTable::*BuiltInFunction)(const std::vector<Value>&);
+    
     std::unordered_map<std::string, BuiltInFunction> m_builtInFunctions;
-
     std::unordered_map<std::string, TokenNode*> m_userFunctions;
 
     std::string m_name;
 
+    std::unordered_map<std::string, SymbolTable*> m_modules;
     std::unordered_map<std::string, SymbolTable*> m_scopes;
     SymbolTable* m_parentScope;
 
     std::unordered_map<std::string, std::string> m_objectNames;
     std::unordered_map<std::string, std::string> m_objectInstanceNames;
-
-    /*bool m_breakCalled = false;
-    bool m_continueCalled = false;
-    bool m_returnCalled = false;
-    bool m_canBreak = false;
-    bool m_canContinue = false;
-    bool m_canReturn = false;
-    Value m_returnValue;*/
 
 private:
     Value Print(const std::vector<Value>& args);
@@ -104,3 +102,8 @@ private:
 };
 
 static SymbolTable g_symbolTable("Global", NULL);
+
+static bool RegisterModule(const std::string& name, SymbolTable* module)
+{
+    return g_symbolTable.RegisterModule(name, module);
+}
