@@ -79,6 +79,12 @@ void Value::operator=(const std::vector<Value>& value)
     new (&m_array) std::vector<Value>(value);
 }
 
+void Value::operator=(const ObjectInstancePointer& value)
+{
+    m_type = Type::ObjectPointer;
+    m_objectInstance = value;
+}
+
 Value Value::operator+(const Value& other) const
 {
     if (m_type == Type::Number && other.m_type == Type::Number)
@@ -307,6 +313,18 @@ bool Value::operator==(const std::vector<Value>& value) const
     }
 }
 
+bool Value::operator==(const ObjectInstancePointer& value) const
+{
+    if (m_type == Type::ObjectPointer)
+    {
+        return m_objectInstance == value;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 bool Value::operator!=(const Value& other) const
 {
     if (m_type == Type::Number && other.m_type == Type::Number)
@@ -352,6 +370,18 @@ bool Value::operator!=(const std::vector<Value>& value) const
     if (m_type == Type::Array)
     {
         return m_array != value;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool Value::operator!=(const ObjectInstancePointer& value) const
+{
+    if (m_type == Type::ObjectPointer)
+    {
+        return m_objectInstance != value;
     }
     else
     {

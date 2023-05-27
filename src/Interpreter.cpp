@@ -356,6 +356,7 @@ Value Interpreter::InterpretIdentifier(TokenNode* node)
     VarRetrievalNode* varRetNode = dynamic_cast<VarRetrievalNode*>(node);
     Token token = varRetNode->GetToken();
     SymbolTable* symbolTable = m_currentSymbolTable;
+    bool searchGlobal = true;
 
     if (varRetNode->GetObject().GetType() == Token::Type::Identifier)
     {
@@ -379,11 +380,17 @@ Value Interpreter::InterpretIdentifier(TokenNode* node)
                 return Value();
             }
         }
+
+        searchGlobal = false;
     }
 
-    if (symbolTable->VarExists(token.GetValue(), true))
+    if (symbolTable->VarExists(token.GetValue(), searchGlobal))
     {
-        return symbolTable->GetVar(token.GetValue(), true);
+        return symbolTable->GetVar(token.GetValue(), searchGlobal);
+    }
+    else if (symbolTable->ObjectInstanceExists(token.GetValue(), searchGlobal))
+    {
+        return Value({ symbolTable->GetObjectInstanceScopeName(token.GetValue()) });
     }
 
     Error e("Unknown Identifier: ", Position("Interpreter", 0, 0, 0));
