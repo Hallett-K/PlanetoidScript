@@ -47,4 +47,6 @@ public:
 private:
     SymbolTable* m_currentSymbolTable;
     ApplicationState m_state;
+
+    std::vector<std::string> SplitString(const std::string& string);
 };

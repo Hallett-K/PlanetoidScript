@@ -577,7 +577,13 @@ TokenNode* Parser::parseIdentifier(Token object)
     else if (m_tokens[m_index].GetType() == Token::Type::Dot)
     {
         advance();
-        return parseIdentifier(var);
+        std::string name;
+        if (object.GetType() == Token::Type::Identifier)
+            name = object.GetValue() + "." + var.GetValue();
+        else
+            name = var.GetValue();
+
+        return parseIdentifier(Token(var.GetType(), name));
     }
     return new VarRetrievalNode(var, object);
 }
