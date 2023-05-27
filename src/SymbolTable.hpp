@@ -31,11 +31,11 @@ public:
     TokenNode* GetUserFunction(const std::string& name, bool global = false) const;
 
     bool RegisterObject(const std::string& name, const std::string& parentName = "");
-    bool ObjectExists(const std::string& name, bool global = false) const;
-    SymbolTable* GetObjectScope(const std::string& name) const;
+    bool ObjectExists(const std::string& name, const std::string& moduleName = "", bool global = false) const;
+    SymbolTable* GetObjectScope(const std::string& name, const std::string& moduleName = "") const;
     std::string GetObjectScopeName(const std::string& name) const;
 
-    bool AddObjectInstance(const std::string& name, const std::string& objectName);
+    bool AddObjectInstance(const std::string& name, const std::string& objectName, const std::string& moduleName = "");
     bool ObjectInstanceExists(const std::string& name, bool global = false) const;
     std::string GetObjectInstanceScopeName(const std::string& name, bool global = false) const;
     SymbolTable* GetObjectInstanceScope(const std::string& name) const;

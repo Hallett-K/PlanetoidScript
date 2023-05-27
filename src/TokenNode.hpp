@@ -267,13 +267,15 @@ private:
 class ObjectDefinitionNode : public TokenNode
 {
 public:
-    ObjectDefinitionNode(Token token, TokenNode* block, TokenNode* parent = nullptr);
+    ObjectDefinitionNode(Token token, Token object, TokenNode* block, TokenNode* parent = nullptr);
     virtual ~ObjectDefinitionNode() = default;
 
+    Token GetObject() const;
     TokenNode* GetBlock() const;
     TokenNode* GetParent() const;
 
 private:
+    Token m_object;
     TokenNode* m_block;
     TokenNode* m_parent;
 };

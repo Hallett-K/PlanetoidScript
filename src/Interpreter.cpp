@@ -264,23 +264,47 @@ Value Interpreter::InterpretVarAssign(TokenNode* node)
     VariableAssignmentNode* varAssignNode = dynamic_cast<VariableAssignmentNode*>(node);
     Token token = varAssignNode->GetToken();
 
+    std::string module = "";
+
     if (varAssignNode->GetRight()->GetType() == NodeType::FunctionCall)
     {
         FunctionCallNode* funcCallNode = dynamic_cast<FunctionCallNode*>(varAssignNode->GetRight());
         Token obj = funcCallNode->GetToken();
-        if (m_currentSymbolTable->ObjectExists(obj.GetValue(), true))
+
+        SymbolTable* scope = m_currentSymbolTable;
+        Token s = funcCallNode->GetObject();
+        if (s.GetType() == Token::Type::Identifier)
         {
-            m_currentSymbolTable->AddObjectInstance(token.GetValue(), obj.GetValue());
+            if (m_currentSymbolTable->ObjectExists(s.GetValue(), "", true))
+            {
+                scope = m_currentSymbolTable->GetScope(m_currentSymbolTable->GetObjectScopeName(s.GetValue()));
+            }
+            else if (g_symbolTable.ModuleExists(s.GetValue()))
+            {
+                scope = g_symbolTable.GetModule(s.GetValue());
+                module = s.GetValue();
+            }
+            else
+            {
+                Error e("Object does not exist: ", Position("Interpreter", 0, 0, 0));
+                std::cout << e.ToString() << s.GetValue() << '\n';
+                return Value();
+            }
+        }
+
+        if (scope->ObjectExists(obj.GetValue(), module, true))
+        {
+            m_currentSymbolTable->AddObjectInstance(token.GetValue(), obj.GetValue(), module);
 
             // Call init function
-            std::string instScopeName = m_currentSymbolTable->GetObjectInstanceScopeName(obj.GetValue());
-            SymbolTable* instScope = m_currentSymbolTable->GetScope(instScopeName);
+            std::string instScopeName = scope->GetObjectInstanceScopeName(obj.GetValue());
+            SymbolTable* instScope = scope->GetScope(instScopeName);
             SymbolTable* currentScope = m_currentSymbolTable;
 
             if (instScope->IsUserFunction("init"))
             {
                 FunctionCallNode initFuncCallNode(Token(Token::Type::Identifier, "init"), token, funcCallNode->GetArguments());
-                InterpretFunctionCall(&initFuncCallNode);
+                InterpretFunctionCall(&initFuncCallNode, scope);
             }
 
             return Value();
@@ -737,13 +761,17 @@ Value Interpreter::InterpretArrayAssign(TokenNode* node)
     return value;
 }
 
-Value Interpreter::InterpretFunctionCall(TokenNode* node)
+Value Interpreter::InterpretFunctionCall(TokenNode* node, SymbolTable* module)
 {
     FunctionCallNode* funcCallNode = dynamic_cast<FunctionCallNode*>(node);
     Token token = funcCallNode->GetToken();
     std::string funcName = token.GetValue();
 
     SymbolTable* scope = m_currentSymbolTable;
+    if (module != nullptr)
+    {
+        scope = module;
+    }
     bool globalFunctionSearch = true;
     if (funcCallNode->GetObject().GetType() == Token::Type::Identifier)
     {

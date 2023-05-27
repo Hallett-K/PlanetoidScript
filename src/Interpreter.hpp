@@ -33,7 +33,7 @@ public:
     Value InterpretArrayAccess(TokenNode* node);
     Value InterpretArrayInit(TokenNode* node);
     Value InterpretArrayAssign(TokenNode* node);
-    Value InterpretFunctionCall(TokenNode* node);
+    Value InterpretFunctionCall(TokenNode* node, SymbolTable* module = nullptr);
     Value InterpretBreak(TokenNode* node);
     Value InterpretContinue(TokenNode* node);
     Value InterpretReturn(TokenNode* node);

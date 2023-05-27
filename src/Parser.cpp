@@ -568,7 +568,7 @@ TokenNode* Parser::parseIdentifier(Token object)
     }
     else if (m_tokens[m_index].GetType() == Token::Type::LeftBracket)
     {
-        return parseArrayIndex();
+        return parseArrayIndex(object);
     }
     else if (m_tokens[m_index].GetType() == Token::Type::LeftParenthesis)
     {
@@ -716,7 +716,7 @@ TokenNode* Parser::parseObjectDefinition(Token object)
         return NULL;
     }
     advance();
-    return new ObjectDefinitionNode(obj, body, parent);
+    return new ObjectDefinitionNode(obj, Token(Token::Type::None, ""), body, parent);
 }
 
 TokenNode* Parser::parseObjectIdentifiers()

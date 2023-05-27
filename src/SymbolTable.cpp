@@ -232,23 +232,51 @@ bool SymbolTable::RegisterObject(const std::string& name, const std::string& par
     return true;
 }
 
-bool SymbolTable::ObjectExists(const std::string& name, bool global) const
+bool SymbolTable::ObjectExists(const std::string& name, const std::string& moduleName, bool global) const
 {
     bool exists = false;
-    if (global)
+    if (global || moduleName != "")
     {
         if (m_parentScope != NULL)
         {
-            exists = m_parentScope->ObjectExists(name, global);
+            exists = m_parentScope->ObjectExists(name, moduleName, global);
         }
     }
-    exists = exists || m_objectNames.find(name) != m_objectNames.end();
+
+    if (moduleName != "")
+    {
+        if (m_modules.find(moduleName) != m_modules.end())
+        {
+            exists = exists || m_modules.at(moduleName)->ObjectExists(name);
+        }
+    }
+    else
+    {
+        exists = exists || m_objectNames.find(name) != m_objectNames.end();
+    }
+
     return exists;
 }
 
-SymbolTable* SymbolTable::GetObjectScope(const std::string& name) const
+SymbolTable* SymbolTable::GetObjectScope(const std::string& name, const std::string& moduleName) const
 {
-    if (m_objectNames.find(name) != m_objectNames.end())
+    if (moduleName != "")
+    {
+        if (m_parentScope != NULL)
+        {
+            return m_parentScope->GetObjectScope(name, moduleName);
+        }
+        else
+        {
+            if (m_modules.find(moduleName) != m_modules.end())
+            {
+                return m_modules.at(moduleName)->GetObjectScope(name);
+            }
+
+            return NULL;
+        }
+    }
+    else if (m_objectNames.find(name) != m_objectNames.end())
     {
         return const_cast<SymbolTable*>(this);
     }
@@ -274,9 +302,9 @@ std::string SymbolTable::GetObjectScopeName(const std::string& name) const
     return "";
 }
 
-bool SymbolTable::AddObjectInstance(const std::string& name, const std::string& objectName)
+bool SymbolTable::AddObjectInstance(const std::string& name, const std::string& objectName, const std::string& moduleName)
 {
-    if (!ObjectExists(objectName, true))
+    if (!ObjectExists(objectName, moduleName, true))
     {
         return false;
     }
@@ -285,7 +313,7 @@ bool SymbolTable::AddObjectInstance(const std::string& name, const std::string& 
     AddScope("ObjectInst" + name + std::to_string(scopeCount));
     m_objectNames[name] = "ObjectInst" + name + std::to_string(scopeCount);
 
-    SymbolTable* objectDefinition = GetObjectScope(objectName);
+    SymbolTable* objectDefinition = GetObjectScope(objectName, moduleName);
     objectDefinition = objectDefinition->GetScope(objectDefinition->GetObjectScopeName(objectName));
 
     SymbolTable* objectInstance = GetScope("ObjectInst" + name + std::to_string(scopeCount));

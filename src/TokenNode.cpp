@@ -260,9 +260,14 @@ TokenNode* FunctionDefinitionNode::GetBlock() const
     return m_block;
 }
 
-ObjectDefinitionNode::ObjectDefinitionNode(Token token, TokenNode* block, TokenNode* parent)
-    : TokenNode(token, NodeType::ObjectDefinition), m_block(block), m_parent(parent)
+ObjectDefinitionNode::ObjectDefinitionNode(Token token, Token object, TokenNode* block, TokenNode* parent)
+    : TokenNode(token, NodeType::ObjectDefinition), m_object(object), m_block(block), m_parent(parent)
 {
+}
+
+Token ObjectDefinitionNode::GetObject() const
+{
+    return m_object;
 }
 
 TokenNode* ObjectDefinitionNode::GetBlock() const
