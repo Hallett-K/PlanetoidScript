@@ -295,6 +295,18 @@ bool Value::operator==(const std::string& value) const
     }
 }
 
+bool Value::operator==(const std::vector<Value>& value) const
+{
+    if (m_type == Type::Array)
+    {
+        return m_array == value;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 bool Value::operator!=(const Value& other) const
 {
     if (m_type == Type::Number && other.m_type == Type::Number)
@@ -328,6 +340,18 @@ bool Value::operator!=(const std::string& value) const
     if (m_type == Type::String)
     {
         return m_string != value;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool Value::operator!=(const std::vector<Value>& value) const
+{
+    if (m_type == Type::Array)
+    {
+        return m_array != value;
     }
     else
     {
