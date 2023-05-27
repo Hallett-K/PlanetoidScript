@@ -303,6 +303,16 @@ Value Interpreter::InterpretVarAssign(TokenNode* node)
             }
             m_currentSymbolTable->GetScope(instanceName)->RegisterVar(token.GetValue(), right);
         }
+        else if (g_symbolTable.ModuleExists(object.GetValue()))
+        {
+            if (!g_symbolTable.GetModule(object.GetValue())->VarExists(token.GetValue()))
+            {
+                Error e("Unknown Variable: ", Position("Interpreter", 0, 0, 0));
+                std::cout << e.ToString() << token.GetValue() << '\n';
+                return Value();
+            }
+            g_symbolTable.GetModule(object.GetValue())->RegisterVar(token.GetValue(), right);
+        }
         else
         {
             Error e("Unknown Object Instance: ", Position("", 0, 0, 0));
@@ -331,6 +341,10 @@ Value Interpreter::InterpretIdentifier(TokenNode* node)
         {
             std::string instanceName = m_currentSymbolTable->GetObjectInstanceScopeName(object.GetValue());
             symbolTable = m_currentSymbolTable->GetScope(instanceName);
+        }
+        else if (g_symbolTable.ModuleExists(object.GetValue()))
+        {
+            symbolTable = g_symbolTable.GetModule(object.GetValue());
         }
         else
         {
@@ -574,6 +588,10 @@ Value Interpreter::InterpretArrayAccess(TokenNode* node)
             std::string instanceName = m_currentSymbolTable->GetObjectInstanceScopeName(object.GetValue());
             array = m_currentSymbolTable->GetScope(instanceName)->GetVar(varName, false);
         }
+        else if (g_symbolTable.ModuleExists(object.GetValue()))
+        {
+            array = g_symbolTable.GetModule(object.GetValue())->GetVar(varName, false);
+        }
         else
         {
             Error e("Array Access on non-object variable: ", Position("Interpreter", 0, 0, 0));
@@ -639,6 +657,10 @@ Value Interpreter::InterpretArrayInit(TokenNode* node)
             std::string instanceName = m_currentSymbolTable->GetObjectInstanceScopeName(object.GetValue());
             m_currentSymbolTable->GetScope(instanceName)->RegisterVar(token.GetValue(), array);
         }
+        else if (g_symbolTable.ModuleExists(object.GetValue()))
+        {
+            g_symbolTable.GetModule(object.GetValue())->RegisterVar(token.GetValue(), array);
+        }
         else
         {
             Error e("Unknown Object Instance: ", Position("", 0, 0, 0));
@@ -669,6 +691,10 @@ Value Interpreter::InterpretArrayAssign(TokenNode* node)
             std::string instanceName = m_currentSymbolTable->GetObjectInstanceScopeName(object.GetValue());
             scope = m_currentSymbolTable->GetScope(instanceName);
             array = scope->GetVar(varName, false);
+        }
+        else if (g_symbolTable.ModuleExists(object.GetValue()))
+        {
+            array = g_symbolTable.GetModule(object.GetValue())->GetVar(varName, false);
         }
         else
         {
