@@ -127,9 +127,9 @@ bool SymbolTable::IsKeyword(const std::string& name) const
     return isKeyword || std::find(m_keywords.begin(), m_keywords.end(), name) != m_keywords.end();
 }
 
-bool SymbolTable::IsBuiltInFunction(const std::string& name) const
+bool SymbolTable::IsBuiltInFunction(const std::string& name, bool forceParent) const
 {
-    if (m_parentScope != NULL)
+    if (m_parentScope != NULL && forceParent)
     {
         return g_symbolTable.IsBuiltInFunction(name);
     }
@@ -168,9 +168,9 @@ void SymbolTable::DestroyUserFunction(const std::string& name)
     }
 }
 
-Value SymbolTable::CallBuiltInFunction(const std::string& name, const std::vector<Value>& args)
+Value SymbolTable::CallBuiltInFunction(const std::string& name, const std::vector<Value>& args, bool forceParent)
 {
-    if (m_parentScope != NULL)
+    if (m_parentScope != NULL && forceParent)
     {
         return m_parentScope->CallBuiltInFunction(name, args);
     }

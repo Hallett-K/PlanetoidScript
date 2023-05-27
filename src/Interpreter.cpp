@@ -814,7 +814,7 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node, SymbolTable* module)
         }
         globalFunctionSearch = false;
     }
-    if (m_currentSymbolTable->IsBuiltInFunction(funcName))
+    if (scope->IsBuiltInFunction(funcName, globalFunctionSearch))
     {
         std::vector<Value> args;
         ArgumentListNode* argListNode = dynamic_cast<ArgumentListNode*>(funcCallNode->GetArguments());
@@ -825,7 +825,7 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node, SymbolTable* module)
                 args.push_back(Interpret(argNode));
             }
         }
-        return m_currentSymbolTable->CallBuiltInFunction(funcName, args);
+        return scope->CallBuiltInFunction(funcName, args, globalFunctionSearch);
     }
     else if (scope->IsUserFunction(funcName, globalFunctionSearch))
     {

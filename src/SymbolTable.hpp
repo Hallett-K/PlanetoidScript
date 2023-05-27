@@ -20,12 +20,12 @@ public:
     void DestroyVar(const std::string& name);
     
     bool IsKeyword(const std::string& name) const;
-    bool IsBuiltInFunction(const std::string& name) const;
+    bool IsBuiltInFunction(const std::string& name, bool forceParent = true) const;
     bool IsUserFunction(const std::string& name, bool global = false) const;
     SymbolTable* GetUserFunctionScope(const std::string& name) const;
     void DestroyUserFunction(const std::string& name);
 
-    Value CallBuiltInFunction(const std::string& name, const std::vector<Value>& args);
+    Value CallBuiltInFunction(const std::string& name, const std::vector<Value>& args, bool forceParent = true);
 
     void RegisterUserFunction(const std::string& name, TokenNode* node);
     TokenNode* GetUserFunction(const std::string& name, bool global = false) const;
