@@ -1,6 +1,10 @@
 #include "Interpreter.hpp"
 
+#include <fstream>
 #include <iostream>
+
+#include "Lexer.hpp"
+#include "Parser.hpp"
 
 #include "Error.hpp"
 #include "SymbolTable.hpp"
@@ -100,6 +104,10 @@ Value Interpreter::Interpret(TokenNode* node)
     else if (node->GetType() == NodeType::ObjectDefinition)
     {
         return InterpretObjectDefinition(node);
+    }
+    else if (node->GetType() == NodeType::Import)
+    {
+        return InterpretImport(node);
     }
     else
     {
@@ -720,6 +728,11 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node)
             scope = m_currentSymbolTable->GetScope(instanceName);
             globalFunctionSearch = false;
         }
+        else if (g_symbolTable.ModuleExists(object.GetValue()))
+        {
+            scope = g_symbolTable.GetModule(object.GetValue());
+            globalFunctionSearch = false;
+        }
         else
         {
             Error e("Function Call on non-object variable: ", Position("Interpreter", 0, 0, 0));
@@ -936,6 +949,88 @@ Value Interpreter::InterpretObjectDefinition(TokenNode* node)
 
     m_currentSymbolTable = m_currentSymbolTable->GetParentScope();
     return Value();
+}
+
+Value Interpreter::InterpretImport(TokenNode* node)
+{
+    if (m_currentSymbolTable != &g_symbolTable)
+    {
+        Error e("Import called inside of object: ", Position("Interpreter", 0, 0, 0));
+        std::cout << e.ToString() << '\n';
+        return Value();
+    }
+
+    std::string dir = m_state.currentDirectory;
+
+    ImportNode* importNode = dynamic_cast<ImportNode*>(node);
+    Token token = importNode->GetToken();
+
+    std::string modulePath = token.GetValue();
+    std::string moduleName = modulePath.substr(modulePath.find_last_of('/') + 1);
+    moduleName = moduleName.substr(0, moduleName.find_last_of('.'));
+
+    if (m_currentSymbolTable->ModuleExists(moduleName))
+    {
+        Error e("Import of already imported module: ", Position("Interpreter", 0, 0, 0));
+        std::cout << e.ToString() << moduleName << '\n';
+        return Value();
+    }
+    
+    std::fstream file;
+    file.open(m_state.currentDirectory + "/" + token.GetValue(), std::ios::in);
+    if (file.is_open())
+    {
+        // Load the file into a string.
+        std::string fileContents;
+        file.seekg(0, std::ios::end);
+        fileContents.resize(file.tellg());
+        file.seekg(0, std::ios::beg);
+        file.read(&fileContents[0], fileContents.size());
+        file.close();
+
+        Lexer lexer(token.GetValue(), fileContents);
+        std::vector<Token> tokens = lexer.generateTokens();
+
+        if (tokens.size() == 0)
+            return Value();
+
+        Parser parser(tokens);
+        TokenNode* node = parser.Parse();
+
+        if (!node)
+            return Value();
+
+        g_symbolTable.RegisterModule(moduleName);
+        m_currentSymbolTable = g_symbolTable.GetModule(moduleName);
+
+        SetCurrentDirectory(m_state.currentDirectory + token.GetValue());
+        Interpret(node);
+
+        m_currentSymbolTable = &g_symbolTable;
+
+        SetCurrentDirectory(dir);
+
+        return Value();
+    }
+    else
+    {
+        Error e("Import of non-existent module: ", Position("Interpreter", 0, 0, 0));
+        std::cout << e.ToString() << token.GetValue() << '\n';
+        return Value();
+    }
+}
+
+void Interpreter::SetCurrentDirectory(const std::string& filePath)
+{
+    std::string directory = filePath.substr(0, filePath.find_last_of('/'));
+    if (directory.size() > 0)
+    {
+        if (directory[0] == '/')
+        {
+            directory = directory.substr(1);
+        }
+    }
+    m_state.currentDirectory = directory;
 }
 
 void Interpreter::Reset()

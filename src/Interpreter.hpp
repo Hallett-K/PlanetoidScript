@@ -5,6 +5,10 @@
 
 class SymbolTable;
 class Value;
+
+class Lexer;
+class Parser;
+
 class Interpreter
 {
 public:
@@ -35,6 +39,9 @@ public:
     Value InterpretReturn(TokenNode* node);
     Value InterpretFunctionDefinition(TokenNode* node);
     Value InterpretObjectDefinition(TokenNode* node);
+    Value InterpretImport(TokenNode* node);
+
+    void SetCurrentDirectory(const std::string& directory);
 
     void Reset();
 private:

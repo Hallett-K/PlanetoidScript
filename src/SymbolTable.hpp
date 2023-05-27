@@ -42,6 +42,7 @@ public:
     void DestroyObjectInstance(const std::string& name);
 
     bool RegisterModule(const std::string& name, SymbolTable* module);
+    bool RegisterModule(const std::string& name);
     bool ModuleExists(const std::string& name) const;
     SymbolTable* GetModule(const std::string& name);
     void DestroyModule(const std::string& name);

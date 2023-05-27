@@ -274,3 +274,8 @@ TokenNode* ObjectDefinitionNode::GetParent() const
 {
     return m_parent;
 }
+
+ImportNode::ImportNode(Token token)
+    : TokenNode(token, NodeType::Import)
+{
+}

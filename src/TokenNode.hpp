@@ -28,6 +28,7 @@ enum class NodeType
     FunctionDefinition,
     ObjectDefinition,
     ObjectAssign,
+    Import
 };
 
 class TokenNode
@@ -275,4 +276,11 @@ public:
 private:
     TokenNode* m_block;
     TokenNode* m_parent;
+};
+
+class ImportNode : public TokenNode
+{
+public:
+    ImportNode(Token token);
+    virtual ~ImportNode() = default;
 };

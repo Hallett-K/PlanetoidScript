@@ -34,7 +34,7 @@ std::vector<Token> Lexer::generateTokens()
     std::vector<Token> tokens;
     while (m_currentChar != '\0')
     {
-        if (m_currentChar == ' ' || m_currentChar == '\t' || m_currentChar == '\n')
+        if (m_currentChar == ' ' || m_currentChar == '\t' || m_currentChar == '\n' || m_currentChar == '\r')
         {
             advance();
         }

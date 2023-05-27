@@ -145,6 +145,7 @@ void RanAsExecutable()
                 file.close();
 
                 // Evaluate the file.
+                G_interpreter.SetCurrentDirectory(input.substr(5, input.length()));
                 Evaluate(fileContents, input.substr(5, input.length()));
             }
             else
@@ -220,6 +221,7 @@ int main(int argc, char** argv)
                     file.close();
 
                     // Evaluate the file.
+                    G_interpreter.SetCurrentDirectory(argv[1]);
                     Evaluate(fileContents, argv[1]);
                 }
                 else
@@ -244,6 +246,7 @@ int main(int argc, char** argv)
                     file.read(&fileContents[0], fileContents.size());
                     file.close();
 
+                    G_interpreter.SetCurrentDirectory(argv[1]);
                     if (std::string(argv[2]) == "-bench")
                         Bench(fileContents, argv[1]);
                     else if (std::string(argv[2]) == "-verify")

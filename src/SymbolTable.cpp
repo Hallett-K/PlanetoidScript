@@ -12,7 +12,7 @@ SymbolTable::SymbolTable(const std::string& name, SymbolTable* parentScope)
 {
     if (m_parentScope == NULL)
     {
-        m_keywords = { "if", "else", "while", "do", "for", "foreach", "true", "false", "null", "break", "continue", "return", "func", "object", "this", "in" };
+        m_keywords = { "if", "else", "while", "do", "for", "foreach", "true", "false", "null", "break", "continue", "return", "func", "object", "this", "in", "import" };
         m_builtInFunctions["print"] = &SymbolTable::Print;
         m_builtInFunctions["substring"] = &SymbolTable::Substring;
         m_builtInFunctions["strlen"] = &SymbolTable::stringlength;
@@ -364,6 +364,21 @@ bool SymbolTable::RegisterModule(const std::string& name, SymbolTable* module)
         return false;
 
     m_modules[name] = module;
+
+    return true;
+}
+
+bool SymbolTable::RegisterModule(const std::string& name)
+{
+    if (m_parentScope != NULL)
+    {
+        return m_parentScope->RegisterModule(name);
+    }
+
+    if (ModuleExists(name))
+        return false;
+
+    m_modules[name] = new SymbolTable(name, this);
 
     return true;
 }

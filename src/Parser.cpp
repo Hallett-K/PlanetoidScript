@@ -266,6 +266,22 @@ TokenNode* Parser::parseFactor()
             
             return new ReturnNode(returnToken, node);
         }
+        else if (m_tokens[m_index].GetValue() == "import")
+        {
+            advance();
+            if (m_tokens[m_index].GetType() == Token::Type::String)
+            {
+                Token node = m_tokens[m_index];
+                advance();
+                return new ImportNode(node);
+            }
+            else
+            {
+                Error e("Expected string", Position("Parser", 0, 0, m_index));
+                std::cout << e.ToString() << '\n';
+                return NULL;
+            }
+        }
 
         Error e("Unknown Keyword: ", Position("Parser", 0, 0, m_index));
         std::cout << e.ToString() << m_tokens[m_index].ToString() << '\n';

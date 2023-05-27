@@ -16,4 +16,6 @@ struct ApplicationState
     Value returnValue;
 
     bool canDefineObject = true;
+
+    std::string currentDirectory = "";
 };

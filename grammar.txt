@@ -14,13 +14,14 @@ ObjectIdentifiers - { Identifier ; [ Identifier ; ... ] }
 // so to call a parent's init function from the child, you'd call super_init();
 
 Identifier - [Identifier.]Identifier [ = ComparisonSequence OR ArrayInit OR FunctionDefinition OR ObjectDefinition OR FunctionCall] OR ArrayIndex OR FunctionCall
+Import - import string
 
 ForStatement - for (Factor; ComparisonSequence; Expression) { Lines } OR foreach (Identifier in Factor) { Lines }
 DoWhileStatement - do { Lines } while (comparisonSequence)
 WhileStatement - while (comparisonSequence) { Lines } 
 IfStatement - if ( comparisonSequence ) { Lines } [else (ifStatement OR { Lines })
 
-Factor - [+/-] Number OR String OR ( ComparisonSequence ) OR Identifier OR IfStatement OR WhileStatement OR ArrayIndex OR ControlStatement
+Factor - [+/-] Number OR String OR ( ComparisonSequence ) OR Identifier OR IfStatement OR WhileStatement OR ArrayIndex OR ControlStatement OR Import
 Primary - Factor [^ Factor]
 Term - Primary [(+/-) Primary]
 Expression - Term [(* /) Term]
