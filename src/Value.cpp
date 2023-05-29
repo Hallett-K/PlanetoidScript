@@ -14,7 +14,7 @@ Value::Value(const Value& other)
     {
         m_number = other.m_number;
     }
-    else if (m_type == Type::String)
+    else if (m_type == Type::String || m_type == Type::ObjectPointer)
     {
         new (&m_string) std::string(other.m_string);
     }
@@ -29,9 +29,17 @@ Value::Value(float value)
 {
 }
 
-Value::Value(const std::string& value)
-    : m_string(value), m_type(Type::String)
+Value::Value(const std::string& value, bool isString)
+    : m_string(value)
 {
+    if (isString)
+    {
+        m_type = Type::String;
+    }
+    else
+    {
+        m_type = Type::ObjectPointer;
+    }
 }
 
 Value::Value(const std::vector<Value>& value)
@@ -51,7 +59,7 @@ void Value::operator=(const Value& other)
     {
         m_number = other.m_number;
     }
-    else if (m_type == Type::String)
+    else if (m_type == Type::String || m_type == Type::ObjectPointer)
     {
         new (&m_string) std::string(other.m_string);
     }
@@ -77,12 +85,6 @@ void Value::operator=(const std::vector<Value>& value)
 {
     m_type = Type::Array;
     new (&m_array) std::vector<Value>(value);
-}
-
-void Value::operator=(const ObjectInstancePointer& value)
-{
-    m_type = Type::ObjectPointer;
-    m_objectInstance = value;
 }
 
 Value Value::operator+(const Value& other) const
@@ -267,7 +269,8 @@ bool Value::operator==(const Value& other) const
     {
         return m_number == other.m_number;
     }
-    else if (m_type == Type::String && other.m_type == Type::String)
+    else if (m_type == Type::String && other.m_type == Type::String
+        || m_type == Type::ObjectPointer && other.m_type == Type::ObjectPointer)
     {
         return m_string == other.m_string;
     }
@@ -291,7 +294,7 @@ bool Value::operator==(float value) const
 
 bool Value::operator==(const std::string& value) const
 {
-    if (m_type == Type::String)
+    if (m_type == Type::String || m_type == Type::ObjectPointer)
     {
         return m_string == value;
     }
@@ -313,25 +316,14 @@ bool Value::operator==(const std::vector<Value>& value) const
     }
 }
 
-bool Value::operator==(const ObjectInstancePointer& value) const
-{
-    if (m_type == Type::ObjectPointer)
-    {
-        return m_objectInstance == value;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 bool Value::operator!=(const Value& other) const
 {
     if (m_type == Type::Number && other.m_type == Type::Number)
     {
         return m_number != other.m_number;
     }
-    else if (m_type == Type::String && other.m_type == Type::String)
+    else if (m_type == Type::String && other.m_type == Type::String
+        || m_type == Type::ObjectPointer && other.m_type == Type::ObjectPointer)
     {
         return m_string != other.m_string;
     }
@@ -355,7 +347,7 @@ bool Value::operator!=(float value) const
 
 bool Value::operator!=(const std::string& value) const
 {
-    if (m_type == Type::String)
+    if (m_type == Type::String || m_type == Type::ObjectPointer)
     {
         return m_string != value;
     }
@@ -370,18 +362,6 @@ bool Value::operator!=(const std::vector<Value>& value) const
     if (m_type == Type::Array)
     {
         return m_array != value;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-bool Value::operator!=(const ObjectInstancePointer& value) const
-{
-    if (m_type == Type::ObjectPointer)
-    {
-        return m_objectInstance != value;
     }
     else
     {
@@ -498,7 +478,7 @@ std::string Value::toString() const
             return std::to_string(m_number);
         }
     }
-    else if (m_type == Type::String)
+    else if (m_type == Type::String || m_type == Type::ObjectPointer)
     {
         return m_string;
     }
@@ -531,6 +511,10 @@ size_t Value::size() const
     else if (m_type == Type::String)
     {
         return m_string.size();
+    }
+    else if (m_type == Type::ObjectPointer)
+    {
+        return 1;
     }
     else
     {

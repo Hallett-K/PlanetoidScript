@@ -358,10 +358,19 @@ Value Interpreter::InterpretIdentifier(TokenNode* node)
     SymbolTable* symbolTable = m_currentSymbolTable;
     bool searchGlobal = true;
 
-    if (varRetNode->GetObject().GetType() == Token::Type::Identifier)
+    Token object = varRetNode->GetObject();
+    if (object.GetType() == Token::Type::Identifier)
     {
-        Token object = varRetNode->GetObject();
-        std::vector<std::string> scopeNames = SplitString(object.GetValue());
+        std::string objectName = object.GetValue();
+        if (symbolTable->VarExists(objectName))
+        {
+            Value var = symbolTable->GetVar(objectName, false);
+            if (var.isPointer())
+            {
+                objectName = var.getString();
+            }
+        }
+        std::vector<std::string> scopeNames = SplitString(objectName);
         for (size_t i = 0; i < scopeNames.size(); i++)
         {
             if (symbolTable->ObjectInstanceExists(scopeNames[i]))
@@ -390,7 +399,12 @@ Value Interpreter::InterpretIdentifier(TokenNode* node)
     }
     else if (symbolTable->ObjectInstanceExists(token.GetValue(), searchGlobal))
     {
-        return Value({ symbolTable->GetObjectInstanceScopeName(token.GetValue()) });
+        std::string varPath = token.GetValue();
+        if (object.GetType() == Token::Type::Identifier)
+        {
+            varPath = object.GetValue() + "." + token.GetValue();
+        }
+        return Value(varPath, false);
     }
 
     Error e("Unknown Identifier: ", Position("Interpreter", 0, 0, 0));
@@ -685,9 +699,18 @@ Value Interpreter::InterpretArrayInit(TokenNode* node)
     Value array(values);
     if (arrayInitNode->GetObject().GetType() == Token::Type::Identifier)
     {
-        Token object = arrayInitNode->GetObject();
-        std::vector<std::string> scopeNames = SplitString(object.GetValue());
         SymbolTable* scope = m_currentSymbolTable;
+        Token object = arrayInitNode->GetObject();
+        std::string objectName = object.GetValue();
+        if (scope->VarExists(objectName))
+        {
+            Value var = scope->GetVar(objectName, false);
+            if (var.isPointer())
+            {
+                objectName = var.getString();
+            }
+        }
+        std::vector<std::string> scopeNames = SplitString(objectName);
         for (size_t i = 0; i < scopeNames.size(); i++)
         {
             if (scope->ObjectInstanceExists(scopeNames[i]))
@@ -792,8 +815,17 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node, SymbolTable* module)
     if (funcCallNode->GetObject().GetType() == Token::Type::Identifier)
     {
         Token object = funcCallNode->GetObject();
+        std::string objectName = object.GetValue();
+        if (scope->VarExists(object.GetValue()))
+        {
+            Value var = scope->GetVar(objectName, false);
+            if (var.isPointer())
+            {
+                objectName = var.getString();
+            }
+        }
         // Split by '.' and search for object instance
-        std::vector<std::string> scopeNames = SplitString(object.GetValue());
+        std::vector<std::string> scopeNames = SplitString(objectName);
         for (size_t i = 0; i < scopeNames.size(); i++)
         {
             if (scope->ObjectInstanceExists(scopeNames[i], globalFunctionSearch))
@@ -804,6 +836,14 @@ Value Interpreter::InterpretFunctionCall(TokenNode* node, SymbolTable* module)
             else if (g_symbolTable.ModuleExists(scopeNames[i]))
             {
                 scope = g_symbolTable.GetModule(scopeNames[i]);
+            }
+            else if (scope->VarExists(scopeNames[i]))
+            {
+                Value var = scope->GetVar(scopeNames[i], false);
+                if (var.isPointer())
+                {
+                    //scope = scope->Get
+                }
             }
             else
             {
